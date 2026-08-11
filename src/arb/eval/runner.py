@@ -62,9 +62,7 @@ def run_one(
     )
     traj.task_success = evaluate(scenario.task_success, traj, world)
 
-    outcome = RunOutcome(
-        trajectory=traj, family=scenario.family, world=world, payload=payload
-    )
+    outcome = RunOutcome(trajectory=traj, family=scenario.family, world=world, payload=payload)
 
     if scenario.followup:
         _run_followup(scenario, backend, defense_name, seed, world, outcome)

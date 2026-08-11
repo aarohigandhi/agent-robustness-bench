@@ -76,8 +76,12 @@ def aggregate(trajectories, key_fields=("family", "defense")) -> dict[tuple[str,
     (trajectory, family) pairs already carrying attack_success / task_success."""
     cells: dict[tuple[str, ...], Cell] = {}
     for traj, family in trajectories:
-        attrs = {"family": family, "defense": traj.defense, "model": traj.model,
-                 "scenario": traj.scenario_id}
+        attrs = {
+            "family": family,
+            "defense": traj.defense,
+            "model": traj.model,
+            "scenario": traj.scenario_id,
+        }
         key = tuple(str(attrs[f]) for f in key_fields)
         cell = cells.setdefault(key, Cell(key=key))
         cell.n += 1
@@ -100,7 +104,12 @@ def markdown_table(cells: dict[tuple[str, ...], Cell], key_fields=("family", "de
     """Render the results grid. Intervals are printed next to every rate so a
     reader cannot accidentally treat a noisy number as a finding."""
     headers = [f.title() for f in key_fields] + [
-        "n", "ASR (95% CI)", "TCR (95% CI)", "Blocked", "Mean s", "Tokens"
+        "n",
+        "ASR (95% CI)",
+        "TCR (95% CI)",
+        "Blocked",
+        "Mean s",
+        "Tokens",
     ]
     rows = [headers, ["---"] * len(headers)]
     for key in sorted(cells):
@@ -168,7 +177,5 @@ def worst_case_summary(cells: dict[tuple[str, ...], Cell]) -> str:
         total_hits = sum(c.attack_successes for _, c in entries)
         mean = total_hits / total_n if total_n else 0.0
         worst_family, worst = max(entries, key=lambda kv: kv[1].asr[0])
-        lines.append(
-            f"| {defense} | {mean * 100:.1f}% | {worst_family} | {_pct(worst.asr)} |"
-        )
+        lines.append(f"| {defense} | {mean * 100:.1f}% | {worst_family} | {_pct(worst.asr)} |")
     return "\n".join(lines)

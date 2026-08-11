@@ -43,15 +43,15 @@ def run_agent(
         reset()
 
     schemas = openai_schema(tool_names)
-    system = BASE_SYSTEM_PROMPT.format(tools=text_schema(tool_names)) + defense.system_prompt_suffix()
+    system = (
+        BASE_SYSTEM_PROMPT.format(tools=text_schema(tool_names)) + defense.system_prompt_suffix()
+    )
 
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": system},
         {"role": "user", "content": task_prompt},
     ]
-    traj = Trajectory(
-        scenario_id=scenario_id, defense=defense.name, model=backend.name, seed=seed
-    )
+    traj = Trajectory(scenario_id=scenario_id, defense=defense.name, model=backend.name, seed=seed)
     ctx = DefenseContext(user_task=task_prompt, step=0)
     started = time.perf_counter()
 

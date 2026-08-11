@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv pip install --system -e ".[dev]"
+
+      - name: Lint
+        run: ruff check src tests
+
+      - name: Format check
+        run: ruff format --check src tests
+
+      - name: Test
+        run: pytest -q
+
+      # The benchmark's own integrity check: every attack scenario must be
+      # reachable by an agent that is trying to be exploited. A scenario that
+      # cannot be broken would otherwise publish as evidence of robustness.
+      - name: Scenario reachability
+        run: arb selftest
+
+      # A full grid on the deterministic backend — no weights, no GPU, no
+      # network — so a regression in the runner or scorer fails the build.
+      - name: Smoke run
+        run: arb run --trials 3 --quiet --out /tmp/ci-runs.jsonl

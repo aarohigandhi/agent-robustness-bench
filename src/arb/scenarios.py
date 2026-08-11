@@ -67,6 +67,4 @@ def load_scenario(path: str | Path) -> Scenario:
 
 def load_all(directory: str | Path | None = None) -> list[Scenario]:
     d = Path(directory) if directory else SCENARIO_DIR
-    return sorted(
-        (load_scenario(p) for p in d.glob("*.yaml")), key=lambda s: s.id
-    )
+    return sorted((load_scenario(p) for p in d.glob("*.yaml")), key=lambda s: s.id)

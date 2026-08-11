@@ -12,7 +12,13 @@ from arb.models.base import ModelBackend
 from arb.models.ollama import OllamaBackend
 from arb.models.scripted import NaiveCompliantBackend, ScriptedBackend
 
-__all__ = ["ModelBackend", "OllamaBackend", "ScriptedBackend", "NaiveCompliantBackend", "get_backend"]
+__all__ = [
+    "ModelBackend",
+    "OllamaBackend",
+    "ScriptedBackend",
+    "NaiveCompliantBackend",
+    "get_backend",
+]
 
 
 def get_backend(spec: str) -> ModelBackend:

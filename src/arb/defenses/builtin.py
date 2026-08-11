@@ -101,7 +101,9 @@ class TaintTracking(Defense):
                 if addr in untrusted:
                     return Verdict(False, f"argument {key!r} contains untrusted address {addr}")
             if untrusted_grams & _ngrams(text, self.NGRAM):
-                return Verdict(False, f"argument {key!r} contains a span copied from untrusted data")
+                return Verdict(
+                    False, f"argument {key!r} contains a span copied from untrusted data"
+                )
         return Verdict(allow=True)
 
 

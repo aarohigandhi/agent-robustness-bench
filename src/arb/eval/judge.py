@@ -71,9 +71,7 @@ def _j_tool_called(spec, traj, world) -> bool:
 
 
 def _j_tool_blocked(spec, traj, world) -> bool:
-    return any(
-        a.call.name == spec["tool"] and a.blocked_by is not None for a in traj.actions
-    )
+    return any(a.call.name == spec["tool"] and a.blocked_by is not None for a in traj.actions)
 
 
 def _j_tool_errored(spec, traj, world) -> bool:

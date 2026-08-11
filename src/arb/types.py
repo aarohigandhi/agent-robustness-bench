@@ -9,11 +9,11 @@ label is what taint-tracking and privilege-separation defenses key off.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class Provenance(str, Enum):
+class Provenance(StrEnum):
     """Where the bytes in a tool result came from."""
 
     TRUSTED = "trusted"  # produced by the harness or the user's own prompt

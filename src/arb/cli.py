@@ -1,10 +1,10 @@
 """Command line interface.
 
-    arb scenarios                        list scenarios
-    arb defenses                         list defenses
-    arb payloads                         list attack families
-    arb run --trials 30                  run the grid and print the results
-    arb selftest                         validate every scenario is exploitable
+arb scenarios                        list scenarios
+arb defenses                         list defenses
+arb payloads                         list attack families
+arb run --trials 30                  run the grid and print the results
+arb selftest                         validate every scenario is exploitable
 """
 
 from __future__ import annotations
@@ -20,8 +20,14 @@ from arb.eval.stats import aggregate, markdown_table, persistence_table, worst_c
 from arb.models import get_backend
 from arb.scenarios import load_all
 
-DEFAULT_DEFENSES = ["none", "prompt_hardening", "spotlighting", "taint_tracking", "tool_policy",
-                    "layered"]
+DEFAULT_DEFENSES = [
+    "none",
+    "prompt_hardening",
+    "spotlighting",
+    "taint_tracking",
+    "tool_policy",
+    "layered",
+]
 
 
 def _cmd_scenarios(args) -> int:
@@ -68,7 +74,6 @@ def _cmd_run(args) -> int:
         t = outcome.trajectory
         flags = "".join(
             ("A" if t.attack_success else "."),
-
         ) + ("T" if t.task_success else ".")
         print(f"\r{bar} {t.scenario_id[:28]:<28} {t.defense:<18} {flags}", end="", flush=True)
 
@@ -129,15 +134,18 @@ def _cmd_selftest(args) -> int:
             failures.append(s.id)
 
     if failures:
-        print(f"\n{len(failures)} scenario(s) not reachable: {', '.join(failures)}", file=sys.stderr)
+        print(
+            f"\n{len(failures)} scenario(s) not reachable: {', '.join(failures)}", file=sys.stderr
+        )
         return 1
     print("\nall scenarios reachable")
     return 0
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="arb", description=__doc__,
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(
+        prog="arb", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     p.add_argument("--scenario-dir", default=None, help="Directory of scenario YAML files.")
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -146,10 +154,17 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("payloads", help="List attack families.").set_defaults(fn=_cmd_payloads)
 
     r = sub.add_parser("run", help="Run the benchmark grid.")
-    r.add_argument("--model", default="scripted:naive_compliant",
-                   help="Backend spec, e.g. ollama:llama3.2:latest")
-    r.add_argument("--trials", type=int, default=30,
-                   help="Runs per cell. Below ~30 the intervals are too wide to conclude anything.")
+    r.add_argument(
+        "--model",
+        default="scripted:naive_compliant",
+        help="Backend spec, e.g. ollama:llama3.2:latest",
+    )
+    r.add_argument(
+        "--trials",
+        type=int,
+        default=30,
+        help="Runs per cell. Below ~30 the intervals are too wide to conclude anything.",
+    )
     r.add_argument("--defense", action="append", help="Repeatable. Defaults to all.")
     r.add_argument("--scenario", action="append", help="Repeatable scenario id filter.")
     r.add_argument("--out", default="results/runs.jsonl")
