@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+
+# Run outputs — raw trajectories are large and regenerable.
+runs/
+results/**/*.jsonl
+!results/.gitkeep
+
+.env
+.DS_Store
