@@ -36,6 +36,12 @@ def run_agent(
     max_steps: int = 12,
     scenario_id: str = "",
 ) -> Trajectory:
+    # Stateful backends (the scripted ones) must forget the previous trial, or
+    # every cell after the first is contaminated by the one before it.
+    reset = getattr(backend, "reset", None)
+    if callable(reset):
+        reset()
+
     schemas = openai_schema(tool_names)
     system = BASE_SYSTEM_PROMPT.format(tools=text_schema(tool_names)) + defense.system_prompt_suffix()
 
