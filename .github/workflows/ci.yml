@@ -16,10 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No python-version here on purpose: setup-uv would create its own .venv
+      # and the explicit `uv venv` below would then collide with it.
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          python-version: ${{ matrix.python-version }}
 
       # Into a venv rather than --system: the runner's system Python is
       # externally managed and rejects the install outright.
