@@ -10,9 +10,9 @@ from __future__ import annotations
 
 import re
 
-from hearsay.defenses.base import Defense, DefenseContext
-from hearsay.tools import SENSITIVE_TOOLS
-from hearsay.types import Provenance, ToolCall, ToolResult, Verdict
+from injecteval.defenses.base import Defense, DefenseContext
+from injecteval.tools import SENSITIVE_TOOLS
+from injecteval.types import Provenance, ToolCall, ToolResult, Verdict
 
 
 class NoDefense(Defense):

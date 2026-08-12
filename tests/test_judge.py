@@ -1,8 +1,8 @@
 import pytest
 
-from hearsay.env.world import World
-from hearsay.eval.judge import JudgeError, evaluate
-from hearsay.types import ActionRecord, ToolCall, ToolResult, Trajectory
+from injecteval.env.world import World
+from injecteval.eval.judge import JudgeError, evaluate
+from injecteval.types import ActionRecord, ToolCall, ToolResult, Trajectory
 
 
 def _traj(**kw) -> Trajectory:

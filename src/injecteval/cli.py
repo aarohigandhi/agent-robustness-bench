@@ -1,10 +1,10 @@
 """Command line interface.
 
-hearsay scenarios                        list scenarios
-hearsay defenses                         list defenses
-hearsay payloads                         list attack families
-hearsay run --trials 30                  run the grid and print the results
-hearsay selftest                         validate every scenario is exploitable
+injecteval scenarios                        list scenarios
+injecteval defenses                         list defenses
+injecteval payloads                         list attack families
+injecteval run --trials 30                  run the grid and print the results
+injecteval selftest                         validate every scenario is exploitable
 """
 
 from __future__ import annotations
@@ -13,12 +13,12 @@ import argparse
 import sys
 from pathlib import Path
 
-from hearsay.attacks import payloads
-from hearsay.defenses import DEFENSES
-from hearsay.eval.runner import run_grid, run_one, write_jsonl
-from hearsay.eval.stats import aggregate, markdown_table, persistence_table, worst_case_summary
-from hearsay.models import get_backend
-from hearsay.scenarios import load_all
+from injecteval.attacks import payloads
+from injecteval.defenses import DEFENSES
+from injecteval.eval.runner import run_grid, run_one, write_jsonl
+from injecteval.eval.stats import aggregate, markdown_table, persistence_table, worst_case_summary
+from injecteval.models import get_backend
+from injecteval.scenarios import load_all
 
 DEFAULT_DEFENSES = [
     "none",
@@ -144,7 +144,7 @@ def _cmd_selftest(args) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
-        prog="hearsay", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+        prog="injecteval", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     p.add_argument("--scenario-dir", default=None, help="Directory of scenario YAML files.")
     sub = p.add_subparsers(dest="cmd", required=True)

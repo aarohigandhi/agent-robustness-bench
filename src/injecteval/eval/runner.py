@@ -13,15 +13,15 @@ from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Any
 
-from hearsay.attacks import inject
-from hearsay.defenses import get_defense
-from hearsay.env.world import World, build_world
-from hearsay.eval.judge import evaluate
-from hearsay.harness.agent import run_agent
-from hearsay.models.base import ModelBackend
-from hearsay.scenarios import Scenario
-from hearsay.tools import resolve_tools
-from hearsay.types import Trajectory
+from injecteval.attacks import inject
+from injecteval.defenses import get_defense
+from injecteval.env.world import World, build_world
+from injecteval.eval.judge import evaluate
+from injecteval.harness.agent import run_agent
+from injecteval.models.base import ModelBackend
+from injecteval.scenarios import Scenario
+from injecteval.tools import resolve_tools
+from injecteval.types import Trajectory
 
 
 @dataclasses.dataclass

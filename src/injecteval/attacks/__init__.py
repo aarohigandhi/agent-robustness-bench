@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from hearsay.env.world import World
+from injecteval.env.world import World
 
 _PAYLOAD_FILE = Path(__file__).parent / "payloads.yaml"
 

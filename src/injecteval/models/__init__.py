@@ -8,9 +8,9 @@ Backend specs are strings so they can live in config files and CLI flags:
 
 from __future__ import annotations
 
-from hearsay.models.base import ModelBackend
-from hearsay.models.ollama import OllamaBackend
-from hearsay.models.scripted import NaiveCompliantBackend, ScriptedBackend
+from injecteval.models.base import ModelBackend
+from injecteval.models.ollama import OllamaBackend
+from injecteval.models.scripted import NaiveCompliantBackend, ScriptedBackend
 
 __all__ = [
     "ModelBackend",

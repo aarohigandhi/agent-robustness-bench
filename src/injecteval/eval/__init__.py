@@ -1,6 +1,6 @@
-from hearsay.eval.judge import evaluate
-from hearsay.eval.runner import RunOutcome, run_grid, run_one, write_jsonl
-from hearsay.eval.stats import (
+from injecteval.eval.judge import evaluate
+from injecteval.eval.runner import RunOutcome, run_grid, run_one, write_jsonl
+from injecteval.eval.stats import (
     Cell,
     aggregate,
     markdown_table,

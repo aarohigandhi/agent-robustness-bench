@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from hearsay.types import Provenance, ToolResult
+from injecteval.types import Provenance, ToolResult
 
 
 @dataclass

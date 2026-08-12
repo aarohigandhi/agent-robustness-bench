@@ -1,8 +1,8 @@
 import pytest
 
-from hearsay.attacks import families, inject, payloads, render
-from hearsay.env.world import build_world
-from hearsay.scenarios import load_all
+from injecteval.attacks import families, inject, payloads, render
+from injecteval.env.world import build_world
+from injecteval.scenarios import load_all
 
 SCENARIOS = load_all()
 

@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from hearsay.env.world import World
-from hearsay.types import ToolCall, ToolResult
+from injecteval.env.world import World
+from injecteval.types import ToolCall, ToolResult
 
 # Tools whose effects leave the sandbox boundary in a real deployment. Defenses
 # and scenarios treat these as the actions worth gating.
