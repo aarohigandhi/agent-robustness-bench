@@ -12,8 +12,8 @@ from typing import Any
 
 import httpx
 
-from arb.models.base import parse_text_tool_call
-from arb.types import ModelResponse, ToolCall
+from hearsay.models.base import parse_text_tool_call
+from hearsay.types import ModelResponse, ToolCall
 
 DEFAULT_HOST = "http://localhost:11434"
 

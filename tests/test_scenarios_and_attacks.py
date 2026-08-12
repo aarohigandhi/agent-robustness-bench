@@ -1,8 +1,8 @@
 import pytest
 
-from arb.attacks import families, inject, payloads, render
-from arb.env.world import build_world
-from arb.scenarios import load_all
+from hearsay.attacks import families, inject, payloads, render
+from hearsay.env.world import build_world
+from hearsay.scenarios import load_all
 
 SCENARIOS = load_all()
 

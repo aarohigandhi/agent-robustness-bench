@@ -18,7 +18,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from arb.types import ModelResponse, ToolCall
+from hearsay.types import ModelResponse, ToolCall
 
 # Marks the exfiltration sink a payload asks for. Payloads embed a literal
 # address; the naive agent picks it up the same way a compromised model would.

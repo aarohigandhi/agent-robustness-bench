@@ -1,8 +1,8 @@
 import pytest
 
-from arb.env.world import World
-from arb.eval.judge import JudgeError, evaluate
-from arb.types import ActionRecord, ToolCall, ToolResult, Trajectory
+from hearsay.env.world import World
+from hearsay.eval.judge import JudgeError, evaluate
+from hearsay.types import ActionRecord, ToolCall, ToolResult, Trajectory
 
 
 def _traj(**kw) -> Trajectory:

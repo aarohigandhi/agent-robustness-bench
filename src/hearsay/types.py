@@ -78,7 +78,7 @@ class Trajectory:
     usage: dict[str, int] = field(default_factory=dict)
     error: str | None = None
 
-    # Scored after the fact by arb.eval.judge
+    # Scored after the fact by hearsay.eval.judge
     attack_success: bool | None = None
     task_success: bool | None = None
 

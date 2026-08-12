@@ -1,6 +1,6 @@
 import pytest
 
-from arb.eval.stats import intervals_overlap, wilson
+from hearsay.eval.stats import intervals_overlap, wilson
 
 
 def test_zero_successes_does_not_claim_certainty():

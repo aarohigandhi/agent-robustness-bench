@@ -11,7 +11,7 @@ import json
 import re
 from typing import Any, Protocol
 
-from arb.types import ModelResponse, ToolCall
+from hearsay.types import ModelResponse, ToolCall
 
 
 class ModelBackend(Protocol):

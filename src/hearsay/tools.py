@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from arb.env.world import World
-from arb.types import ToolCall, ToolResult
+from hearsay.env.world import World
+from hearsay.types import ToolCall, ToolResult
 
 # Tools whose effects leave the sandbox boundary in a real deployment. Defenses
 # and scenarios treat these as the actions worth gating.

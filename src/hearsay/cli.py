@@ -1,10 +1,10 @@
 """Command line interface.
 
-arb scenarios                        list scenarios
-arb defenses                         list defenses
-arb payloads                         list attack families
-arb run --trials 30                  run the grid and print the results
-arb selftest                         validate every scenario is exploitable
+hearsay scenarios                        list scenarios
+hearsay defenses                         list defenses
+hearsay payloads                         list attack families
+hearsay run --trials 30                  run the grid and print the results
+hearsay selftest                         validate every scenario is exploitable
 """
 
 from __future__ import annotations
@@ -13,12 +13,12 @@ import argparse
 import sys
 from pathlib import Path
 
-from arb.attacks import payloads
-from arb.defenses import DEFENSES
-from arb.eval.runner import run_grid, run_one, write_jsonl
-from arb.eval.stats import aggregate, markdown_table, persistence_table, worst_case_summary
-from arb.models import get_backend
-from arb.scenarios import load_all
+from hearsay.attacks import payloads
+from hearsay.defenses import DEFENSES
+from hearsay.eval.runner import run_grid, run_one, write_jsonl
+from hearsay.eval.stats import aggregate, markdown_table, persistence_table, worst_case_summary
+from hearsay.models import get_backend
+from hearsay.scenarios import load_all
 
 DEFAULT_DEFENSES = [
     "none",
@@ -144,7 +144,7 @@ def _cmd_selftest(args) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
-        prog="arb", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+        prog="hearsay", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     p.add_argument("--scenario-dir", default=None, help="Directory of scenario YAML files.")
     sub = p.add_subparsers(dest="cmd", required=True)

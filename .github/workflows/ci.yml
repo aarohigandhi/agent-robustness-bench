@@ -42,9 +42,9 @@ jobs:
       # reachable by an agent that is trying to be exploited. A scenario that
       # cannot be broken would otherwise publish as evidence of robustness.
       - name: Scenario reachability
-        run: uv run arb selftest
+        run: uv run hearsay selftest
 
       # A full grid on the deterministic backend — no weights, no GPU, no
       # network — so a regression in the runner or scorer fails the build.
       - name: Smoke run
-        run: uv run arb run --trials 3 --quiet --out /tmp/ci-runs.jsonl
+        run: uv run hearsay run --trials 3 --quiet --out /tmp/ci-runs.jsonl

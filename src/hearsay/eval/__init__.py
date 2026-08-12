@@ -1,6 +1,6 @@
-from arb.eval.judge import evaluate
-from arb.eval.runner import RunOutcome, run_grid, run_one, write_jsonl
-from arb.eval.stats import (
+from hearsay.eval.judge import evaluate
+from hearsay.eval.runner import RunOutcome, run_grid, run_one, write_jsonl
+from hearsay.eval.stats import (
     Cell,
     aggregate,
     markdown_table,

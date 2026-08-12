@@ -1,4 +1,10 @@
-# arb — Adversarial Robustness Benchmark for Tool-Using Agents
+# hearsay
+
+**How often prompt injection works on AI agents, and what stops it.**
+
+> *hearsay* (n.) — a statement from a source you cannot cross-examine, inadmissible for
+> exactly that reason. Which is what an agent is doing every time it treats the contents
+> of a file as an instruction.
 
 A benchmark and defense evaluation for **indirect prompt injection** in agents with real
 tool access. An agent is given a benign task in an environment whose data has been
@@ -55,7 +61,7 @@ development. See [What is actually left](docs/RELATED_WORK.md#what-is-actually-l
 
 The payload measured here does **not fire immediately**.
 
-In [`memory-persistence-004`](src/arb/scenario_files/memory-persistence-004.yaml), the
+In [`memory-persistence-004`](src/hearsay/scenario_files/memory-persistence-004.yaml), the
 payload asks for nothing to be sent. It asks only that a benign-sounding "user
 preference" be written to the agent's durable memory. Session 0 therefore ends with
 `attack_success = false` — **a single-turn benchmark scores that run as a clean pass.**
@@ -101,23 +107,23 @@ uv venv --python 3.12 && uv pip install -e ".[dev]"
 The default backend needs no model, no GPU, and no network:
 
 ```bash
-uv run arb selftest
+uv run hearsay selftest
 ```
 
 ```bash
-uv run arb run --trials 30
+uv run hearsay run --trials 30
 ```
 
 Against a local open-weights model via [Ollama](https://ollama.com):
 
 ```bash
-uv run arb run --model ollama:llama3.2:latest --trials 30
+uv run hearsay run --model ollama:llama3.2:latest --trials 30
 ```
 
 Inspect the pieces:
 
 ```bash
-uv run arb scenarios && uv run arb defenses && uv run arb payloads
+uv run hearsay scenarios && uv run hearsay defenses && uv run hearsay payloads
 ```
 
 ---
@@ -125,7 +131,7 @@ uv run arb scenarios && uv run arb defenses && uv run arb payloads
 ## How it is put together
 
 ```
-src/arb/
+src/hearsay/
 ├── harness/agent.py    the agent loop — one function, shared by every run
 ├── env/world.py        hermetic in-memory filesystem, inbox, web, memory
 ├── tools.py            tool schemas, privilege groups, dispatch
@@ -161,7 +167,7 @@ vulnerability**, and it earns its place three ways:
 1. CI exercises the entire pipeline with no weights, no GPU, and no network.
 2. It validates scenarios. An attack that cannot succeed against an agent *trying* to
    be exploited means the scenario is broken — and a broken scenario publishes as
-   evidence of robustness. `arb selftest` enforces this.
+   evidence of robustness. `hearsay selftest` enforces this.
 3. It gives every defense a control. A defense that cannot move ASR against this
    backend does not work at all, independent of model choice.
 
@@ -194,7 +200,7 @@ statement. If two intervals overlap, no difference may be claimed.
 The mean of "flawless" and "catastrophic" describes neither. And in security the mean
 is the wrong statistic outright: **an attacker does not sample families uniformly, they
 use the one that works.** The honest exposure number is closer to the maximum, which is
-why `arb run` prints a worst-case-per-defense table alongside the grid.
+why `hearsay run` prints a worst-case-per-defense table alongside the grid.
 
 ---
 

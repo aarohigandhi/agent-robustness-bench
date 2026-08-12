@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from arb.env.world import World
+from hearsay.env.world import World
 
 _PAYLOAD_FILE = Path(__file__).parent / "payloads.yaml"
 

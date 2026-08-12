@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from arb.types import Provenance, ToolResult
+from hearsay.types import Provenance, ToolResult
 
 
 @dataclass

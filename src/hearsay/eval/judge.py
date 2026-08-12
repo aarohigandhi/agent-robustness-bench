@@ -23,8 +23,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from arb.env.world import World
-from arb.types import Trajectory
+from hearsay.env.world import World
+from hearsay.types import Trajectory
 
 
 class JudgeError(ValueError):

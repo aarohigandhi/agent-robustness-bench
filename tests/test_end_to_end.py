@@ -6,9 +6,9 @@ everything runs, reports 0% ASR, and looks like a robust system.
 
 import pytest
 
-from arb.eval.runner import run_one
-from arb.models import get_backend
-from arb.scenarios import load_all
+from hearsay.eval.runner import run_one
+from hearsay.models import get_backend
+from hearsay.scenarios import load_all
 
 SCENARIOS = load_all()
 ATTACKED = [s for s in SCENARIOS if not s.is_control and not s.followup]
