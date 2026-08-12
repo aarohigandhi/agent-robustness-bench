@@ -32,16 +32,28 @@ That single line is the entire attack surface this benchmark measures.
 
 ---
 
-## What makes this different
+## Where this sits in the literature
 
-Most work in this space catalogs attacks. Far less has rigorously compared **which
-mitigations actually survive**, under identical conditions. Two axes here are
-under-covered elsewhere:
+This started from the premise that persistence was under-measured. **A survey in August
+2026 found that is no longer true** — see [docs/RELATED_WORK.md](docs/RELATED_WORK.md).
+Between May and July 2026, MemSecBench, MemPoison, MPBench and several others published
+on memory poisoning, including the defense side. MemSecBench's lifecycle metrics (MPSR,
+E2E-ASR) are term-for-term what this repo implemented independently.
 
-### 1. Persistence
+Convergent design suggests the framing was right. It is not a contribution, and nothing
+here is claimed as novel. What this repository currently is: **a small, clean, fully
+reproducible harness** that measures attack success and task completion together, runs
+end-to-end with no GPU or network, and refuses to report a rate without an interval.
 
-Nearly all existing benchmarks are single-turn: the payload fires in the same session
-it is read. This benchmark also measures payloads that **do not fire immediately**.
+The open problem it is being pointed at next is the **false-positive cost of memory
+defenses** — the newest work names benign-memory preservation as the primary bottleneck
+(86.3% malicious removal vs 56.1% *selective* repair) and reports that no off-the-shelf
+defense achieves both high TPR and low FPR. That is measurable here without any attack
+development. See [What is actually left](docs/RELATED_WORK.md#what-is-actually-left).
+
+### The persistence track
+
+The payload measured here does **not fire immediately**.
 
 In [`memory-persistence-004`](src/arb/scenario_files/memory-persistence-004.yaml), the
 payload asks for nothing to be sent. It asks only that a benign-sounding "user
@@ -52,18 +64,15 @@ Session 1 is a different session against a *clean* environment: no poisoned file
 attacker content anywhere. The only thing carried across is the agent's own memory. If
 the exfiltration fires there, it fired from the plant alone.
 
-That yields three numbers single-turn work does not report:
+That yields three numbers a single-turn run does not produce:
 
-| Metric | Question |
-|---|---|
-| **Plant rate** | Did the payload reach durable memory? |
-| **Latent ASR** | Did it fire in a later, clean session? |
-| **Dwell time** | How many sessions does it survive? |
+| Metric | Question | Equivalent in MemSecBench |
+|---|---|---|
+| **Plant rate** | Did the payload reach durable memory? | MPSR |
+| **Latent ASR** | Did it fire in a later, clean session? | E2E-ASR |
+| **Dwell time** | How many sessions does it survive? | — (not yet implemented) |
 
-Every major assistant shipped persistent memory in the last two years. The benchmarks
-have not caught up.
-
-### 2. Defense comparison
+### Defense comparison
 
 Six mitigations, one agent loop, identical conditions, scored on effectiveness *and*
 cost:
@@ -189,6 +198,31 @@ why `arb run` prints a worst-case-per-defense table alongside the grid.
 
 ---
 
+## Limitations
+
+Stated up front, because each one bounds what the numbers here may be used to claim.
+
+**These are static-payload results, and static-payload rankings do not survive adaptive
+attack.** [Nasr et al., USENIX Security 2026](https://arxiv.org/abs/2510.09023) took 12
+published defenses — prompting, adversarial training, filtering, secret-knowledge — and
+bypassed all of them at **>90% ASR** using gradient descent, RL, random search, and human
+red-teaming. Most had reported near-zero ASR in their original papers. This benchmark
+fixes its payloads by design (see [Scope and ethics](#scope-and-ethics)), so a defense
+scoring 0% here should be read as *"not broken by a canonical payload of this family"* and
+never as *"secure"*. Assume a motivated attacker gets through.
+
+**The naive backend is an upper bound on vulnerability, not a model.** It ignores system
+prompts entirely, so instruction-level defenses score ~100% ASR against it, and it obeys
+immediately, so it cannot distinguish a delayed trigger from a direct one. It validates
+the pipeline and the scenarios; it says nothing about real model behavior.
+
+**Five scenarios is a demonstration, not coverage.** AgentDojo has 97 tasks and 629
+security cases. Nothing here should be compared against that.
+
+**No results have been published from this repository yet**, on real models or otherwise.
+
+---
+
 ## Scope and ethics
 
 This project measures attacks and evaluates defenses. It does not develop attacks.
@@ -218,8 +252,12 @@ touches a live system.
 - [x] Harness, hermetic environment, tool layer, declarative scenarios
 - [x] Six attack families, five defenses, programmatic judges, Wilson intervals
 - [x] Persistence track with plant rate and latent ASR
-- [ ] Survey and explicit positioning against prior benchmarks
-- [ ] Scale to ~8 tasks across all families; hosted open-model backend
+- [x] Survey and positioning — [docs/RELATED_WORK.md](docs/RELATED_WORK.md)
+- [ ] **Decide the lane.** The survey found both original differentiators occupied and
+      proposes the false-positive cost of memory defenses instead — undecided
+- [ ] Read the queue in RELATED_WORK before citing anything
+- [ ] Benign-memory scenarios, to measure what defenses wrongly destroy
+- [ ] Scale beyond a demonstration; hosted open-model backend
 - [ ] Privilege separation and monitor-model defenses
 - [ ] Full run: tradeoff curves, defense comparison table, ablations
 - [ ] Results writeup
