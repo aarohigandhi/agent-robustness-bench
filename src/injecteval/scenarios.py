@@ -27,6 +27,10 @@ class Scenario:
     attack_success: dict[str, Any]
     task_success: dict[str, Any]
     injection: dict[str, Any] | None = None
+    # Did the agent take *any* attacker-directed step, short of full success?
+    # Binary ASR scores a partial compliance as a clean pass, which is wrong: an
+    # agent that opened the credentials file but did not send it was compromised.
+    attack_progress: dict[str, Any] | None = None
     # Benign scenarios: what it looks like when a defense blocks legitimate work.
     false_positive: dict[str, Any] | None = None
     description: str = ""
@@ -63,6 +67,7 @@ def load_scenario(path: str | Path) -> Scenario:
         environment=raw["environment"],
         tools=raw.get("tools") or [],
         injection=injection,
+        attack_progress=raw.get("attack_progress"),
         false_positive=raw.get("false_positive"),
         family=(injection or {}).get("family", "none"),
         attack_success=raw.get("attack_success") or {},

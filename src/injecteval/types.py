@@ -73,6 +73,9 @@ class Trajectory:
     messages: list[dict[str, Any]] = field(default_factory=list)
     final_answer: str = ""
     steps_used: int = 0
+    # Times the harness re-prompted after the model produced no tool call.
+    # Surfaced because it is an intervention, not a property of the model.
+    nudges_used: int = 0
     stopped_reason: str = ""
     latency_s: float = 0.0
     usage: dict[str, int] = field(default_factory=dict)
@@ -80,6 +83,8 @@ class Trajectory:
 
     # Scored after the fact by injecteval.eval.judge
     attack_success: bool | None = None
+    # Any attacker-directed action at all, whether or not the attack completed.
+    attack_progress: bool | None = None
     task_success: bool | None = None
     # Benign scenarios only: the defense blocked legitimate work. None means the
     # scenario does not measure this, which is different from "no false positive".

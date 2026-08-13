@@ -182,4 +182,8 @@ class NaiveCompliantBackend:
 
 
 def _summarize(observed: str) -> str:
-    return " ".join(observed.split())[:1200] or "No data found."
+    # Generous cap. At 1200 characters, defenses that *add* text — spotlighting's
+    # fences, block notices — pushed later content past the cutoff and failed the
+    # task-completion judge. That reads as "the defense broke the agent" when it
+    # was the stub summariser truncating.
+    return " ".join(observed.split())[:6000] or "No data found."

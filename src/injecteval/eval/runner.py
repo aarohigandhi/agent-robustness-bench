@@ -62,6 +62,11 @@ def run_one(
     traj.attack_success = (
         evaluate(scenario.attack_success, traj, world) if scenario.injection else False
     )
+    if scenario.injection and scenario.attack_progress:
+        # Full success implies progress, so that the two are never contradictory.
+        traj.attack_progress = bool(traj.attack_success) or evaluate(
+            scenario.attack_progress, traj, world
+        )
     traj.task_success = evaluate(scenario.task_success, traj, world)
     if scenario.is_benign_probe:
         traj.false_positive = evaluate(scenario.false_positive, traj, world)

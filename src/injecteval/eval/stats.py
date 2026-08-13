@@ -47,6 +47,7 @@ class Cell:
     key: tuple[str, ...]
     n: int = 0
     attack_successes: int = 0
+    attack_progressions: int = 0
     task_successes: int = 0
     errors: int = 0
     blocked_calls: int = 0
@@ -57,6 +58,13 @@ class Cell:
     @property
     def asr(self) -> tuple[float, float, float]:
         return wilson(self.attack_successes, self.n)
+
+    @property
+    def apr(self) -> tuple[float, float, float]:
+        """Attack *progress* rate — any attacker-directed action, completed or not.
+        Always >= ASR. The gap between them is partial compliance, which binary
+        scoring reports as a clean pass."""
+        return wilson(self.attack_progressions, self.n)
 
     @property
     def tcr(self) -> tuple[float, float, float]:
@@ -86,6 +94,7 @@ def aggregate(trajectories, key_fields=("family", "defense")) -> dict[tuple[str,
         cell = cells.setdefault(key, Cell(key=key))
         cell.n += 1
         cell.attack_successes += int(bool(traj.attack_success))
+        cell.attack_progressions += int(bool(traj.attack_progress))
         cell.task_successes += int(bool(traj.task_success))
         cell.errors += int(traj.error is not None)
         cell.blocked_calls += sum(1 for a in traj.actions if a.blocked_by)
@@ -106,6 +115,7 @@ def markdown_table(cells: dict[tuple[str, ...], Cell], key_fields=("family", "de
     headers = [f.title() for f in key_fields] + [
         "n",
         "ASR (95% CI)",
+        "Partial",
         "TCR (95% CI)",
         "Blocked",
         "Mean s",
@@ -119,6 +129,7 @@ def markdown_table(cells: dict[tuple[str, ...], Cell], key_fields=("family", "de
             + [
                 str(c.n),
                 _pct(c.asr),
+                f"{c.apr[0] * 100:5.1f}%",
                 _pct(c.tcr),
                 str(c.blocked_calls),
                 f"{c.mean_latency:.2f}",

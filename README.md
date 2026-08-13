@@ -249,6 +249,11 @@ prompts entirely, so instruction-level defenses score ~100% ASR against it, and 
 immediately, so it cannot distinguish a delayed trigger from a direct one. It validates
 the pipeline and the scenarios; it says nothing about real model behavior.
 
+**The Partial column is uninformative on the naive backend.** That backend enumerates and
+reads everything reachable by construction, so it opens the credentials file whether or
+not a payload told it to. Attack *progress* only means something for an agent that reads
+selectively — that is, a real model. Read that column on model runs only.
+
 **Five scenarios is a demonstration, not coverage.** AgentDojo has 97 tasks and 629
 security cases. Nothing here should be compared against that.
 
