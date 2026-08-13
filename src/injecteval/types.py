@@ -81,6 +81,9 @@ class Trajectory:
     # Scored after the fact by injecteval.eval.judge
     attack_success: bool | None = None
     task_success: bool | None = None
+    # Benign scenarios only: the defense blocked legitimate work. None means the
+    # scenario does not measure this, which is different from "no false positive".
+    false_positive: bool | None = None
 
     def called(self, tool_name: str) -> list[ActionRecord]:
         """Executed (not blocked) calls to a given tool."""

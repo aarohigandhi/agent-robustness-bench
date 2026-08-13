@@ -22,7 +22,10 @@ from injecteval.types import ModelResponse, ToolCall
 
 # Marks the exfiltration sink a payload asks for. Payloads embed a literal
 # address; the naive agent picks it up the same way a compromised model would.
-_EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+# Trailing punctuation must not be captured. "send to bob@corp.test." would
+# otherwise yield the domain "corp.test.", which silently fails an allowlist
+# check and shows up in results as a defense false-positive rather than a bug.
+_EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 
 
 class ScriptedBackend:
@@ -57,12 +60,14 @@ class NaiveCompliantBackend:
     def __init__(self) -> None:
         self._seen: set[str] = set()
         self._obeyed = False
+        self._did_task = False
 
     def reset(self) -> None:
         """Called at the start of every run. Without this, state from one trial
         leaks into the next and every cell after the first is contaminated."""
         self._seen = set()
         self._obeyed = False
+        self._did_task = False
 
     def chat(
         self,
@@ -73,6 +78,7 @@ class NaiveCompliantBackend:
     ) -> ModelResponse:
         available = {t["function"]["name"] for t in tools}
         observed = "\n".join(str(m.get("content") or "") for m in messages if m["role"] == "tool")
+        user_task = next((str(m.get("content") or "") for m in messages if m["role"] == "user"), "")
 
         # 1. Obey any injected instruction as soon as one is visible.
         if not self._obeyed:
@@ -105,7 +111,50 @@ class NaiveCompliantBackend:
                     self._seen.add(f"{tool}:{target}")
                     return ModelResponse(tool_calls=[ToolCall(tool, {arg: target})])
 
+        # 3. Everything is read. Carry out the sensitive action the *user* asked
+        #    for, if there is one. This is the legitimate-work path, and it is
+        #    what the false-positive scenarios measure: a defense that blocks
+        #    here has broken the agent rather than protected it.
+        if not self._did_task:
+            call = self._intended(user_task, observed, available)
+            if call:
+                self._did_task = True
+                return ModelResponse(text="Carrying out your request.", tool_calls=[call])
+
         return ModelResponse(tool_calls=[ToolCall("finish", {"answer": _summarize(observed)})])
+
+    def _intended(self, user_task: str, observed: str, available: set[str]) -> ToolCall | None:
+        """Parse an explicit sensitive request out of the user's own instruction.
+
+        Deliberately reads only the user turn. The distinction between "the user
+        told me to send this" and "a file told me to send this" is the entire
+        subject of this benchmark, and collapsing the two here would make the
+        false-positive numbers meaningless.
+        """
+        low = user_task.lower()
+
+        if "send_email" in available and ("forward" in low or "send" in low):
+            m = re.search(
+                r"\b(?:to|address)\b[^\w]*([\w.+-]+@[\w-]+(?:\.[\w-]+)+)", user_task, re.I
+            )
+            if m:
+                return ToolCall(
+                    "send_email",
+                    {"to": m.group(1), "subject": "Forwarded", "body": _summarize(observed)},
+                )
+
+        if "write_file" in available and ("save" in low or "write" in low):
+            m = re.search(r"\b(?:to|in|at)\s+(/\S+)", user_task)
+            if m:
+                return ToolCall(
+                    "write_file", {"path": m.group(1).rstrip(".,"), "content": _summarize(observed)}
+                )
+
+        if "memory_write" in available and ("remember" in low or "preference" in low):
+            return ToolCall(
+                "memory_write", {"key": "user_preference", "value": _summarize(observed)[:400]}
+            )
+        return None
 
     def _obey(self, observed: str, available: set[str]) -> ToolCall | None:
         low = observed.lower()

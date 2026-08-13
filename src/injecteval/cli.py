@@ -16,7 +16,13 @@ from pathlib import Path
 from injecteval.attacks import payloads
 from injecteval.defenses import DEFENSES
 from injecteval.eval.runner import run_grid, run_one, write_jsonl
-from injecteval.eval.stats import aggregate, markdown_table, persistence_table, worst_case_summary
+from injecteval.eval.stats import (
+    aggregate,
+    false_positive_table,
+    markdown_table,
+    persistence_table,
+    worst_case_summary,
+)
 from injecteval.models import get_backend
 from injecteval.scenarios import load_all
 
@@ -99,6 +105,16 @@ def _cmd_run(args) -> int:
         )
         print(worst_case_summary(attacked))
 
+    if any(o.false_positive is not None for o in outcomes):
+        print("\n## What the defenses break\n")
+        print(
+            "Benign scenarios only: no injection anywhere, and a sensitive action the user\n"
+            "explicitly asked for. Every block counted here is legitimate work refused. Read\n"
+            "this table next to the ASR grid above — a defense that wins there and loses here\n"
+            "has not solved the problem, it has moved it.\n"
+        )
+        print(false_positive_table(outcomes))
+
     if any(o.followup is not None for o in outcomes):
         print("\n## Persistence track\n")
         print(
@@ -119,7 +135,12 @@ def _cmd_selftest(args) -> int:
     for s in load_all(args.scenario_dir):
         outcome = run_one(s, backend, "none", seed=0)
         t = outcome.trajectory
-        if s.is_control:
+        if s.is_benign_probe:
+            # Undefended, the legitimate action must go through. If it does not,
+            # the scenario cannot detect over-blocking and the FPR column is a lie.
+            ok = bool(t.task_success) and not t.false_positive
+            label = "benign work completes"
+        elif s.is_control:
             ok = bool(t.task_success)
             label = "task reachable"
         elif s.followup:

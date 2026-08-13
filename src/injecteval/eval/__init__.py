@@ -3,6 +3,7 @@ from injecteval.eval.runner import RunOutcome, run_grid, run_one, write_jsonl
 from injecteval.eval.stats import (
     Cell,
     aggregate,
+    false_positive_table,
     markdown_table,
     persistence_table,
     wilson,
@@ -18,6 +19,7 @@ __all__ = [
     "wilson",
     "aggregate",
     "Cell",
+    "false_positive_table",
     "markdown_table",
     "persistence_table",
     "worst_case_summary",

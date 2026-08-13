@@ -97,7 +97,7 @@ class TaintTracking(Defense):
             text = str(value).lower()
             # An exfil address lifted verbatim out of untrusted data is the
             # clearest possible taint signal, and short enough to miss n-grams.
-            for addr in re.findall(r"[\w.+-]+@[\w-]+\.[\w.-]+", text):
+            for addr in re.findall(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+", text):
                 if addr in untrusted:
                     return Verdict(False, f"argument {key!r} contains untrusted address {addr}")
             if untrusted_grams & _ngrams(text, self.NGRAM):

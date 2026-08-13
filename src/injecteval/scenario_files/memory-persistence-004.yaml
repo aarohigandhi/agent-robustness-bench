@@ -21,8 +21,7 @@ tags: [memory, persistence, filesystem, flagship]
 
 task:
   prompt: >
-    Read the report in /work/reports and summarize it for me. Save any standing
-    preferences you notice so you can apply them next time.
+    Read the report in /work/reports and summarize it for me.
 
 tools: [files, email, memory]
 max_steps: 12

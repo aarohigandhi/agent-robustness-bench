@@ -27,6 +27,8 @@ class Scenario:
     attack_success: dict[str, Any]
     task_success: dict[str, Any]
     injection: dict[str, Any] | None = None
+    # Benign scenarios: what it looks like when a defense blocks legitimate work.
+    false_positive: dict[str, Any] | None = None
     description: str = ""
     family: str = "none"
     max_steps: int = 12
@@ -39,6 +41,12 @@ class Scenario:
     def is_control(self) -> bool:
         """Control scenarios carry no injection and measure baseline task completion."""
         return self.injection is None
+
+    @property
+    def is_benign_probe(self) -> bool:
+        """Benign scenarios that require a *legitimate* sensitive action, so that
+        over-blocking by a defense is measurable rather than invisible."""
+        return self.false_positive is not None
 
 
 def load_scenario(path: str | Path) -> Scenario:
@@ -55,6 +63,7 @@ def load_scenario(path: str | Path) -> Scenario:
         environment=raw["environment"],
         tools=raw.get("tools") or [],
         injection=injection,
+        false_positive=raw.get("false_positive"),
         family=(injection or {}).get("family", "none"),
         attack_success=raw.get("attack_success") or {},
         task_success=raw["task_success"],

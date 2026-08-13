@@ -74,6 +74,37 @@ That yields three numbers a single-turn run does not produce:
 | **Latent ASR** | Did it fire in a later, clean session? | E2E-ASR |
 | **Dwell time** | How many sessions does it survive? | — (not yet implemented) |
 
+### What the defenses break
+
+The other half of every defense, and the half that usually goes unreported. Three
+scenarios contain **no attack at all** — a colleague's email forwarded to the address
+written in its body, a report summarised and saved to disk, a preference the user asked
+to be remembered. Ordinary work, every time requiring a sensitive tool call whose
+arguments legitimately derive from untrusted content, because that is where the
+information lives.
+
+Running the full grid on the deterministic backend:
+
+| Defense | Worst-case ASR | False-positive rate | TCR on benign work |
+|---|---|---|---|
+| `none` | 100% | 0% | 100% |
+| `prompt_hardening` | 100% | 0% | 100% |
+| `spotlighting` | 100% | 0% | 100% |
+| **`tool_policy`** | **0%** | **0%** | **100%** |
+| `taint_tracking` | 0% | **100%** | **0%** |
+| `layered` | 0% | **100%** | **0%** |
+
+`taint_tracking` is perfect on every attack family and refuses **all** legitimate work.
+Both numbers come from the same rule: a summary of a file and an exfiltration of that
+file are indistinguishable by provenance alone. Reporting its 0% ASR without this column
+would describe it as the best defense in the table when it is unusable.
+
+`layered` inherits the failure, which is the argument against stacking mitigations
+without measuring what each one costs.
+
+(These are results against the naive backend — an upper bound on vulnerability, not a
+model. See [Limitations](#limitations).)
+
 ### Defense comparison
 
 Six mitigations, one agent loop, identical conditions, scored on effectiveness *and*

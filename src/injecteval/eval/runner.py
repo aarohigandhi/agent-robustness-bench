@@ -30,6 +30,8 @@ class RunOutcome:
     family: str
     world: World
     payload: str = ""
+    # Benign scenarios only: the defense blocked legitimate work. None = not measured.
+    false_positive: bool | None = None
     # Persistence track only: the second-session trajectory, run against carried memory.
     followup: Trajectory | None = None
     plant_success: bool | None = None
@@ -61,8 +63,16 @@ def run_one(
         evaluate(scenario.attack_success, traj, world) if scenario.injection else False
     )
     traj.task_success = evaluate(scenario.task_success, traj, world)
+    if scenario.is_benign_probe:
+        traj.false_positive = evaluate(scenario.false_positive, traj, world)
 
-    outcome = RunOutcome(trajectory=traj, family=scenario.family, world=world, payload=payload)
+    outcome = RunOutcome(
+        trajectory=traj,
+        family=scenario.family,
+        world=world,
+        payload=payload,
+        false_positive=traj.false_positive,
+    )
 
     if scenario.followup:
         _run_followup(scenario, backend, defense_name, seed, world, outcome)
