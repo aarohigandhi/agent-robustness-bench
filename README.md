@@ -110,16 +110,36 @@ model. See [Limitations](#limitations).)
 Six mitigations, one agent loop, identical conditions, scored on effectiveness *and*
 cost:
 
-| Defense | Mechanism |
-|---|---|
-| `none` | Baseline |
-| `prompt_hardening` | System-prompt instruction to treat tool output as data |
-| `spotlighting` | Nonce-fenced delimiting of untrusted spans |
-| `taint_tracking` | Veto sensitive calls whose arguments derive from untrusted bytes |
-| `tool_policy` | Allowlist egress destinations and protected paths |
-| `layered` | All of the above, as most teams would actually deploy |
+| Defense | Mechanism | Cost |
+|---|---|---|
+| `none` | Baseline | — |
+| `prompt_hardening` | System-prompt instruction to treat tool output as data | free |
+| `spotlighting` | Nonce-fenced delimiting of untrusted spans | free |
+| `taint_tracking` | Veto sensitive calls whose arguments derive from untrusted bytes | free |
+| `tool_policy` | Allowlist egress destinations and protected paths | free |
+| `layered` | The four above, as most teams would actually deploy | free |
+| `privilege_separation` | Quarantined model extracts facts; the planner never sees raw content | **1 call per untrusted read** |
+| `monitor` | Second model reviews each sensitive call against the user's request | **1 call per sensitive action** |
 
-Planned: privilege separation (quarantined LLM, typed extraction) and a monitor model.
+The last two are the ones the 2026 literature reports as materially stronger than
+prompt-level mitigations, and they are the only two that cost money per step. Both meter
+their calls and tokens into the trajectory, so the comparison shows what the protection
+costs rather than only what it stops — ranking a monitor against a regex without that
+column compares two different kinds of thing.
+
+Two implementation notes, since both are simplified:
+
+- `privilege_separation` extracts to **free text**, where the real design (CaMeL and
+  successors) extracts into a typed schema fixed by the task. The typing is what makes
+  the channel narrow, so these numbers are a lower bound on the design's strength.
+- `monitor` **fails closed** on an unparseable verdict. A monitor that allows when
+  confused is not a monitor, and that failure would be invisible in results because it
+  looks exactly like a clean run.
+
+Both refuse to construct without a model backend rather than silently degrading, and
+`injecteval run` leaves them out on the deterministic backend — handing them the stub
+would yield a monitor that vetoes everything and an extractor that returns nothing, which
+reads as 0% ASR and 0% TCR and is entirely an artifact.
 
 ---
 

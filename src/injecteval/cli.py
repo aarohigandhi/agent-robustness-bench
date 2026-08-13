@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 from injecteval.attacks import payloads
-from injecteval.defenses import DEFENSES
+from injecteval.defenses import DEFENSES, MODEL_BACKED
 from injecteval.eval.runner import run_grid, run_one, write_jsonl
 from injecteval.eval.stats import (
     aggregate,
@@ -26,7 +26,8 @@ from injecteval.eval.stats import (
 from injecteval.models import get_backend
 from injecteval.scenarios import load_all
 
-DEFAULT_DEFENSES = [
+# Defenses that cost nothing but a regex and a system prompt. Always runnable.
+STATIC_DEFENSES = [
     "none",
     "prompt_hardening",
     "spotlighting",
@@ -66,7 +67,22 @@ def _cmd_run(args) -> int:
             return 1
 
     backend = get_backend(args.model)
-    defenses = args.defense or DEFAULT_DEFENSES
+    scripted = args.model.startswith("scripted:")
+    # Model-backed defenses need a real model to reason with. Handing them the
+    # deterministic stub would produce a monitor that vetoes everything and an
+    # extractor that returns nothing — 0% ASR and 0% TCR, which looks like a
+    # result and is an artifact. Off by default on the stub, refused if asked for.
+    defenses = args.defense or (
+        STATIC_DEFENSES if scripted else STATIC_DEFENSES + sorted(MODEL_BACKED)
+    )
+    if scripted and (bad := sorted(set(defenses) & MODEL_BACKED)):
+        print(
+            f"error: {', '.join(bad)} "
+            f"{'requires' if len(bad) == 1 else 'require'} a real model; "
+            f"rerun with --model ollama:<name>",
+            file=sys.stderr,
+        )
+        return 1
     total = len(scenarios) * len(defenses) * args.trials
 
     print(f"model    : {backend.name}")

@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 
 from injecteval.defenses.base import Defense, DefenseContext
+from injecteval.defenses.model_based import MonitorModel, PrivilegeSeparation
 from injecteval.tools import SENSITIVE_TOOLS
 from injecteval.types import Provenance, ToolCall, ToolResult, Verdict
 
@@ -140,7 +141,8 @@ class Layered(Defense):
     name = "layered"
     description = "prompt_hardening + spotlighting + taint_tracking + tool_policy."
 
-    def __init__(self) -> None:
+    def __init__(self, backend=None) -> None:
+        super().__init__(backend)
         self._parts = [PromptHardening(), Spotlighting(), TaintTracking(), ToolPolicy()]
 
     def system_prompt_suffix(self) -> str:
@@ -170,11 +172,24 @@ def _ngrams(text: str, n: int) -> set[str]:
 
 DEFENSES: dict[str, type[Defense]] = {
     d.name: d
-    for d in (NoDefense, PromptHardening, Spotlighting, TaintTracking, ToolPolicy, Layered)
+    for d in (
+        NoDefense,
+        PromptHardening,
+        Spotlighting,
+        TaintTracking,
+        ToolPolicy,
+        Layered,
+        PrivilegeSeparation,
+        MonitorModel,
+    )
 }
 
+# Defenses that spend model calls of their own. Listed so the CLI can leave them
+# out of a run that has no model rather than crashing partway through a grid.
+MODEL_BACKED = {n for n, d in DEFENSES.items() if d.needs_model}
 
-def get_defense(name: str) -> Defense:
+
+def get_defense(name: str, backend=None) -> Defense:
     if name not in DEFENSES:
         raise ValueError(f"Unknown defense {name!r}. Available: {', '.join(sorted(DEFENSES))}")
-    return DEFENSES[name]()
+    return DEFENSES[name](backend)

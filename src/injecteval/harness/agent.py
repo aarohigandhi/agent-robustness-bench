@@ -129,6 +129,13 @@ def run_agent(
     else:
         traj.stopped_reason = "max_steps"
 
+    # A defense that spends its own model calls has a cost, and a comparison
+    # table that hides it would rank a monitor against a regex as if they were
+    # the same kind of thing.
+    if defense.model_calls:
+        traj.usage["defense_calls"] = defense.model_calls
+        traj.usage["defense_tokens"] = defense.model_tokens
+
     traj.nudges_used = nudges
     traj.steps_used = len(traj.actions)
     traj.messages = messages

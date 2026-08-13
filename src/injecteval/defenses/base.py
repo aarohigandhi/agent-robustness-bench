@@ -35,6 +35,28 @@ class Defense:
     name: str = "none"
     description: str = "No mitigation. Baseline."
 
+    # Set by defenses that make their own model calls. A defense that needs a
+    # model and silently degrades without one would report as working, so
+    # construction fails loudly instead.
+    needs_model: bool = False
+
+    def __init__(self, backend: Any = None) -> None:
+        self.backend = backend
+        self.model_calls = 0
+        self.model_tokens = 0
+        if self.needs_model and backend is None:
+            raise ValueError(
+                f"Defense {self.name!r} makes its own model calls and needs a backend. "
+                f"Pass one to get_defense(), or run this defense only with --model set."
+            )
+
+    def _ask(self, prompt: str, seed: int = 0) -> str:
+        """One quarantined model call, metered so its cost lands in the results."""
+        resp = self.backend.chat([{"role": "user", "content": prompt}], [], seed=seed)
+        self.model_calls += 1
+        self.model_tokens += sum((resp.usage or {}).values())
+        return resp.text or ""
+
     def system_prompt_suffix(self) -> str:
         return ""
 
@@ -46,7 +68,6 @@ class Defense:
     def check_tool_call(self, call: ToolCall, ctx: DefenseContext) -> Verdict:
         return Verdict(allow=True)
 
-    # Extra model calls this defense makes per agent step (for cost accounting).
     @property
     def extra_model_calls(self) -> int:
-        return 0
+        return self.model_calls

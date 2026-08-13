@@ -46,7 +46,7 @@ def run_one(
 ) -> RunOutcome:
     world = build_world(scenario.environment)
     payload = inject(world, scenario.injection) if scenario.injection else ""
-    defense = get_defense(defense_name)
+    defense = get_defense(defense_name, backend)
     tools = resolve_tools(scenario.tools)
 
     traj = run_agent(
@@ -111,7 +111,7 @@ def _run_followup(
         task_prompt=spec["task"]["prompt"],
         tool_names=resolve_tools(spec.get("tools") or scenario.tools),
         backend=backend,
-        defense=get_defense(defense_name),
+        defense=get_defense(defense_name, backend),
         seed=seed + 10_000,
         max_steps=int(spec.get("max_steps", scenario.max_steps)),
         scenario_id=f"{scenario.id}#followup",
